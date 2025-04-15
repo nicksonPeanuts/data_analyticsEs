@@ -194,29 +194,73 @@ print(paesi_esportatori)
 
 #9
 
-vettoreAree <- factor(nazioni, levels=c("Asia", "Europe", "Americas",))
+tapply(nazioni$infmort, nazioni$areaGeo, mean, na.rm = TRUE )
+
+# 10. Quante nazioni hanno un tasso di mortalità infantile superiore o uguale a 300?
+
+sum(nazioni$infmort >= 300)
+
+# 11. Quante delle nazioni identificate al punto 10 esportano petrolio?
+
+nazioni_interessate <- nazioni[nazioni$infmort >= 300, ]
+nrow(nazioni_interessate[nazioni_interessate$oil == "yes", ])
+
+# 12. Dividere la finestra grafica in 2 righe e 2 colonne. In ogni spazio, rappresentare con un boxplot
+# la distribuzione della mortalità infantile condizionata alla regione geografica. Impostare lo stesso
+# range sull’asse y ed il titolo del grafico.
+
+y_range <- range(nazioni$infmort, na.rm=TRUE)
+
+par(mfrow = c(2,2))
+
+america <- nazioni[nazioni$areaGeo == "Americas", 4] 
+africa <- nazioni[nazioni$areaGeo == "Africa", 4] 
+europa <- nazioni[nazioni$areaGeo == "Europe", 4] 
+asia <- nazioni[nazioni$areaGeo == "Asia", 4]
+
+fivenum(america)
+fivenum(africa)
+fivenum(europa)
+fivenum(asia)
+
+#plotting boxes
+boxplot(america, horizontal=TRUE, main=paste("Area: ", "america"), ylim = y_range)
+boxplot(africa, horizontal=TRUE, main=paste("Area: ", "africa"), ylim = y_range)
+boxplot(europa, horizontal=TRUE, main=paste("Area: ", "europa"), ylim = y_range)
+boxplot(asia, horizontal=TRUE, main=paste("Area: ", "asia"), ylim = y_range)
 
 
+# 13. Rappresentare con un istogramma la distribuzione del reddito. Modificare l’etichetta dell’asse x
+# con il nome della variabile ed eliminare il titolo.
+
+par(mfrow = c(1,1))
+
+hist(nazioni$reddito, main= "", xlab="Reddito pro capite")
 
 
+#14. Aggiungere al grafico precedente le mediane del reddito per area geografica utilizzando dei punti
+# di colore diverso.
+
+mediane <- tapply(nazioni$reddito, nazioni$areaGeo, median, na.rm=TRUE)
+
+points(x = mediane,
+       y = rep(5, length(mediane)),          #
+       col = rainbow(length(mediane)),      
+       pch = 19,
+       cex = 1.5)
 
 
+# 15. Dividere la variabile reddito in classi utilizzando le seguenti categorie: “fino a 500”, “(500, 1500]”,
+# “(1500, 4000]”, “4000 e più”. Salvare la nuova variabile in un oggetto chiamato redditoCat.
+
+redditoCat = cut(nazioni$reddito, breaks= c(-Inf,500,1500, 4000, Inf), labels=c("(0-500]", "(500-1500]", "(1500,4000]", "più di 4000"))
+redditoCat
+
+sum(redditoCat == "più di 4000", na.rm = TRUE)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+tabella <- prop.table(table(redditoCat, nazioni$oil), margin = 2)
+round(tabella * 100, 2)
 
 
 
